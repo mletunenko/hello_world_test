@@ -7,6 +7,13 @@ class RunConfig(BaseModel):
     port: int = 8000
 
 
+class DatabaseConfig(BaseModel):
+    url: str = "postgresql+asyncpg://user:password@127.0.0.1:5432/heroes"
+    echo: bool = False
+    echo_pool: bool = False
+    pool_size: int = 50
+    max_overflow: int = 10
+
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
@@ -16,6 +23,7 @@ class Settings(BaseSettings):
         env_prefix="APP_CONFIG__",
     )
     run: RunConfig = RunConfig()
+    db: DatabaseConfig = DatabaseConfig()
 
 
 settings = Settings()
