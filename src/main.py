@@ -1,11 +1,11 @@
-import asyncio
-
 import uvicorn
 from fastapi import APIRouter, FastAPI
 
+from api.heroes import router as heroes_router
 from core.config import settings
 
 combined_router = APIRouter(prefix="/api/v1")
+combined_router.include_router(heroes_router)
 
 app = FastAPI()
 app.include_router(combined_router)

@@ -5,7 +5,8 @@ from .base import Base
 
 class HeroModel(Base):
     __tablename__ = "heroes"
-    name: Mapped[str] = mapped_column(unique=True)
+    external_id: Mapped[int] = mapped_column(nullable=True, unique=True)
+    name: Mapped[str] = mapped_column(default="")
     intelligence: Mapped[int] = mapped_column(nullable=True)
     strength: Mapped[int] = mapped_column(nullable=True)
     speed: Mapped[int] = mapped_column(nullable=True)
