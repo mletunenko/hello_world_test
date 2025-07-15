@@ -34,7 +34,7 @@ class HeroService:
             external_id = int(h["id"])
             stmt = select(HeroModel).where(and_(HeroModel.name == h["name"], HeroModel.external_id == external_id))
             result = await session.execute(stmt)
-            exists = result.first()
+            exists = result.scalars().first()
             if exists:
                 continue
 
