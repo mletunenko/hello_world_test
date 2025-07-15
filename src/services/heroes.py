@@ -32,11 +32,9 @@ class HeroService:
         created = []
         for h in matched:
             external_id = int(h["id"])
-
-            result = await session.execute(
-                select(HeroModel).where(and_(HeroModel.name == h["name"], HeroModel.external_id == external_id))
-            )
-            exists = result.scalar_one_or_none()
+            stmt = select(HeroModel).where(and_(HeroModel.name == h["name"], HeroModel.external_id == external_id))
+            result = await session.execute(stmt)
+            exists = result.first()
             if exists:
                 continue
 
@@ -46,9 +44,9 @@ class HeroService:
                     name=h["name"],
                     external_id=external_id,
                     intelligence=None if stats["intelligence"] == "null" else int(stats["intelligence"]),
-                    strength=None if stats["intelligence"] == "null" else int(stats["intelligence"]),
-                    speed=None if stats["intelligence"] == "null" else int(stats["intelligence"]),
-                    power=None if stats["intelligence"] == "null" else int(stats["intelligence"]),
+                    strength=None if stats["strength"] == "null" else int(stats["strength"]),
+                    speed=None if stats["speed"] == "null" else int(stats["speed"]),
+                    power=None if stats["power"] == "null" else int(stats["power"]),
                 )
             except (KeyError, ValueError) as exc:
                 logger.exception(exc)
