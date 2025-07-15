@@ -11,54 +11,57 @@ from models import HeroModel
 from schemas.hero import HeroOut
 
 
-async def create_hero(name: str, session: AsyncSession) -> list[HeroOut]:
-    async with httpx.AsyncClient() as client:
-        url = f"{settings.hero_api.base_url}/{settings.hero_api.token}/search/{name}"
-        response = await client.get(url)
+class HeroService:
 
-    if response.status_code != 200:
-        raise ExternalAPIError
+    @staticmethod
+    async def create_hero(name: str, session: AsyncSession) -> list[HeroOut]:
+        async with httpx.AsyncClient() as client:
+            url = f"{settings.hero_api.base_url}/{settings.hero_api.token}/search/{name}"
+            response = await client.get(url)
 
-    data = response.json()
-    results = data.get("results", [])
+        if response.status_code != 200:
+            raise ExternalAPIError
 
-    matched = [h for h in results if h["name"].lower() == name.lower()]
-    if not matched:
-        raise HeroNotFound
+        data = response.json()
+        results = data.get("results", [])
 
-    created = []
-    for h in matched:
-        external_id = int(h["id"])
+        matched = [h for h in results if h["name"].lower() == name.lower()]
+        if not matched:
+            raise HeroNotFound
 
-        result = await session.execute(
-            select(HeroModel).where(and_(HeroModel.name == h["name"], HeroModel.external_id == external_id))
-        )
-        exists = result.scalar_one_or_none()
-        if exists:
-            continue
+        created = []
+        for h in matched:
+            external_id = int(h["id"])
 
-        try:
-            stats = h["powerstats"]
-            hero = HeroModel(
-                name=h["name"],
-                external_id=external_id,
-                intelligence=None if stats["intelligence"] == "null" else int(stats["intelligence"]),
-                strength=None if stats["intelligence"] == "null" else int(stats["intelligence"]),
-                speed=None if stats["intelligence"] == "null" else int(stats["intelligence"]),
-                power=None if stats["intelligence"] == "null" else int(stats["intelligence"]),
+            result = await session.execute(
+                select(HeroModel).where(and_(HeroModel.name == h["name"], HeroModel.external_id == external_id))
             )
-        except (KeyError, ValueError) as exc:
-            logger.exception(exc)
-            continue
+            exists = result.scalar_one_or_none()
+            if exists:
+                continue
 
-        session.add(hero)
-        created.append(hero)
+            try:
+                stats = h["powerstats"]
+                hero = HeroModel(
+                    name=h["name"],
+                    external_id=external_id,
+                    intelligence=None if stats["intelligence"] == "null" else int(stats["intelligence"]),
+                    strength=None if stats["intelligence"] == "null" else int(stats["intelligence"]),
+                    speed=None if stats["intelligence"] == "null" else int(stats["intelligence"]),
+                    power=None if stats["intelligence"] == "null" else int(stats["intelligence"]),
+                )
+            except (KeyError, ValueError) as exc:
+                logger.exception(exc)
+                continue
 
-    if not created:
-        raise HeroAlreadyExists(f"{name} уже есть в базе")
+            session.add(hero)
+            created.append(hero)
 
-    await session.commit()
-    for hero in created:
-        await session.refresh(hero)
+        if not created:
+            raise HeroAlreadyExists(f"{name} уже есть в базе")
 
-    return created
+        await session.commit()
+        for hero in created:
+            await session.refresh(hero)
+
+        return created

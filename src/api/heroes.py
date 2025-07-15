@@ -4,7 +4,7 @@ from core.enums import ClientErrorMessage
 from core.exceptions import ExternalAPIError, HeroAlreadyExists, HeroNotFound
 from db.postgres import SessionDep
 from schemas.hero import HeroCreate, HeroOut
-from services.heroes import create_hero
+from services.heroes import HeroService
 
 router = APIRouter(prefix="/hero", tags=["hero"])
 
@@ -12,7 +12,7 @@ router = APIRouter(prefix="/hero", tags=["hero"])
 @router.post("", summary="Создать нового героя", response_model=list[HeroOut])
 async def add_hero(data: HeroCreate, session: SessionDep) -> list[HeroOut]:
     try:
-        created_heroes = await create_hero(data.name, session)
+        created_heroes = await HeroService.create_hero(data.name, session)
         return created_heroes
     except ExternalAPIError:
         raise HTTPException(status_code=502, detail=ClientErrorMessage.EXTERNAL_API_ERROR.value)
