@@ -17,7 +17,7 @@ def hero_create() -> HeroCreate:
 
 
 @pytest_asyncio.fixture
-def hero_out_single() -> HeroOut:
+def hero_out() -> HeroOut:
     return HeroOut(
         id=uuid.uuid4(),
         name="Maverick",
