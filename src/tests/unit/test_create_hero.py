@@ -8,6 +8,8 @@ from schemas.hero import HeroCreate
 from services.heroes import HeroService
 from tests.unit.conftest import make_mock_session
 
+### HeroService.create_hero
+
 
 @pytest.mark.asyncio
 async def test_create_single_hero(
