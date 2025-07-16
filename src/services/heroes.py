@@ -12,7 +12,6 @@ from schemas.hero import HeroOut
 
 
 class HeroService:
-
     @staticmethod
     async def create_hero(name: str, session: AsyncSession) -> list[HeroOut]:
         async with httpx.AsyncClient() as client:
