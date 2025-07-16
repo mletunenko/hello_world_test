@@ -8,7 +8,7 @@ from core.config import settings
 from core.exceptions import ExternalAPIError, HeroAlreadyExists, HeroNotFound
 from core.logger import logger
 from models import HeroModel
-from schemas.hero import HeroOut
+from schemas.hero import HeroListParams, HeroOut
 
 
 class HeroService:
@@ -62,3 +62,12 @@ class HeroService:
             await session.refresh(hero)
 
         return created
+
+
+    @staticmethod
+    async def get_heroes_list(session: AsyncSession, query_params: HeroListParams) -> list[HeroOut]:
+        stmt = select(HeroModel).where(*query_params.build_filters())
+
+        result = await session.execute(stmt)
+        task_list = list(result.scalars().all())
+        return task_list
