@@ -70,4 +70,6 @@ class HeroService:
 
         result = await session.execute(stmt)
         task_list = list(result.scalars().all())
+        if not task_list:
+            raise HeroNotFound
         return task_list

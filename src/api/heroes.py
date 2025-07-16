@@ -26,6 +26,8 @@ async def add_hero(data: HeroCreate, session: SessionDep) -> list[HeroOut]:
 async def list_heroes(session: SessionDep, query_params: HeroListParams = Depends()) -> list[HeroOut]:
     try:
         heroes = await HeroService.get_heroes_list(session, query_params)
+    except HeroNotFound:
+        raise HTTPException(status_code=404, detail=ClientErrorMessage.HERO_NOT_FOUND_ERROR.value)
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
 
