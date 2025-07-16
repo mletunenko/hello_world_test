@@ -1,3 +1,4 @@
+import uuid
 from types import TracebackType
 from typing import Any, Callable, Optional, Type
 from unittest.mock import AsyncMock, MagicMock
@@ -7,12 +8,25 @@ import pytest_asyncio
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from models.base import Base
-from schemas.hero import HeroCreate
+from schemas.hero import HeroCreate, HeroOut
 
 
 @pytest_asyncio.fixture
-def unique_hero() -> str:
+def hero_create() -> HeroCreate:
     return HeroCreate(name="Maverick")
+
+
+@pytest_asyncio.fixture
+def hero_out_single() -> HeroOut:
+    return HeroOut(
+        id=uuid.uuid4(),
+        name="Maverick",
+        intelligence=50,
+        strength=50,
+        speed=50,
+        power=50,
+        external_id=1,
+    )
 
 
 @pytest_asyncio.fixture
