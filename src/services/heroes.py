@@ -69,7 +69,7 @@ class HeroService:
         stmt = select(HeroModel).where(*query_params.build_filters())
 
         result = await session.execute(stmt)
-        task_list = list(result.scalars().all())
-        if not task_list:
+        hero_list = list(result.scalars().all())
+        if not hero_list:
             raise HeroNotFound
-        return task_list
+        return hero_list
